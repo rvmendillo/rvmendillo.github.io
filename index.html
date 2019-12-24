@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="aos.css" />
 		<title>Center for Guidance and Counseling</title>
 		<script>
-			var loggedIn;
+			var loggedIn = false;
 			var users = JSON.parse(localStorage.users);
 			if (localStorage.user == null)
 				localStorage.user = "";
@@ -58,12 +58,12 @@
 							break;
 						}
 					if (localStorage.user == "admin" && localStorage.pass == "pass") {
-							document.getElementById("USER_NAME").disabled = true;
-							document.getElementById("USER_PASS").disabled = true;
-							document.getElementById("submit").innerHTML = "Log Out";
-							document.getElementById("submit").style.background = "rgb(212,134,35)";
-							loggedIn = true;
-						}
+						document.getElementById("USER_NAME").disabled = true;
+						document.getElementById("USER_PASS").disabled = true;
+						document.getElementById("submit").innerHTML = "Log Out";
+						document.getElementById("submit").style.background = "rgb(212,134,35)";
+						loggedIn = true;
+					}
 				}		
 				else {
 					document.getElementById("USER_NAME").value = '';
