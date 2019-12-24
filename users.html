@@ -27,11 +27,12 @@
 				localStorage.users = JSON.stringify(array);
 			}
 			function loadLocalStorage() {
-				if (checkAdminAccess()) {
+				//if (checkAdminAccess()) {
+					users = JSON.parse(localStorage.users);
 					document.getElementsByTagName("section")[0].style.display = "block";
 					for (var userNum = 0; userNum < users.length; userNum++)
 						insertData(users[userNum]);
-				}
+				//}
 			}
 			function checkAdminAccess() {
 				document.getElementsByTagName("section")[0].style.display = "none";
