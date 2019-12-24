@@ -28,7 +28,6 @@
 			}
 			function loadLocalStorage() {
 				if (checkAdminAccess()) {
-					users = JSON.parse(localStorage.users);
 					document.getElementsByTagName("section")[0].style.display = "block";
 					for (var userNum = 0; userNum < users.length; userNum++)
 						insertData(users[userNum]);
@@ -46,11 +45,17 @@
 				return false;
 			}
 			function submit() {
+				var repetitionExists = false;
 				if (document.getElementById("USER_ID").value != '' && document.getElementById("USER_NAME").value != '' && document.getElementById("USER_PASS").value != '' && document.getElementById("USER_FN").value != '' && document.getElementById("USER_LN").value != '') {
 					var formData = getFields();
+					for (var userNum = 0; userNum < users.length; userNum++)
+						if (users[userNum][0] == document.getElementById("USER_ID").value || users[userNum][1] == document.getElementById("USER_NAME").value)
+							repetitionExists = true;
 					if (selectedRow == null) {
-						insertData(formData);
-						saveLocalStorage(formData);
+						if (!repetitionExists) {
+							insertData(formData);
+							saveLocalStorage(formData);
+						}
 					}
 					else
 						updateData(formData);
@@ -119,13 +124,19 @@
 				document.getElementById("submit").innerHTML = "Update Changes";
 			}
 			function updateData(data) {
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
-					selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+				var repetitionExists = false;
+				for (var userNum = 0; userNum < users.length; userNum++)
+					if ((users[userNum][0] == document.getElementById("USER_ID").value || users[userNum][1] == document.getElementById("USER_NAME").value) && userNum != selectedRow.rowIndex - 1)
+						repetitionExists = true;
+				if (!repetitionExists) {
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
+						selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
+						users[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
+					sortArray(users);
+					refreshTable();
+				}
 				document.getElementById("submit").innerHTML = "Append";
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
-					users[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
-				sortArray(users);
-				refreshTable();
 			}
 			function deleteData(td) {
 				var row = td.parentElement.parentElement.rowIndex;
@@ -334,7 +345,7 @@
 				<br />
 				<div class="row">
 					<div class="col-6">
-						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center of Guidance and Counseling, 2020.</h6>
+						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center for Guidance and Counseling, 2020.</h6>
 						<h6 class="text-secondary">All rights reserved.</h6>
 					</div>
 					<div class="col float-lg-right" style="text-align: right;">

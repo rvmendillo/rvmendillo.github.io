@@ -32,10 +32,6 @@
 			}
 			function loadLocalStorage() {
 				if (checkAdminAccess()) {
-					clients = JSON.parse(localStorage.clients);
-					users = JSON.parse(localStorage.users);
-					schedules = JSON.parse(localStorage.schedules);
-					sortArray(clients);
 					document.getElementsByTagName("section")[0].style.display = "block";
 					for (var clientNum = 0; clientNum < clients.length; clientNum++)
 						insertData(clients[clientNum]);
@@ -43,6 +39,10 @@
 			}
 			function checkAdminAccess() {
 				document.getElementsByTagName("section")[0].style.display = "none";
+				clients = JSON.parse(localStorage.clients);
+				users = JSON.parse(localStorage.users);
+				schedules = JSON.parse(localStorage.schedules);
+				sortArray(clients);
 				if (localStorage.user == "admin" && localStorage.pass == "pass")
 					return true;
 				for (var userNum = 0; userNum < users.length; userNum++)
@@ -51,11 +51,17 @@
 				return false;
 			}
 			function submit() {
+				var repetitionExists = false;
 				if (document.getElementById("CLIENT_ID").value != '' && document.getElementById("CLIENT_FN").value != '' && document.getElementById("CLIENT_LN").value != '') {
 					var formData = getFields();
+					for (var clientNum = 0; clientNum < clients.length; clientNum++)
+						if (clients[clientNum][0] == document.getElementById("CLIENT_ID").value || clients[clientNum][3] == document.getElementById("CLIENT_FN").value + ' ' + document.getElementById("CLIENT_LN").value)
+							repetitionExists = true;
 					if (selectedRow == null) {
-						insertData(formData);
-						saveLocalStorage(formData);
+						if (!repetitionExists) {
+							insertData(formData);
+							saveLocalStorage(formData);
+						}
 					}
 					else
 						updateData(formData);
@@ -124,25 +130,31 @@
 				document.getElementById("submit").innerHTML = "Update Changes";
 			}
 			function updateData(data) {
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
-					if (fieldCtr == 3)
-						for (var schedNum = 0; schedNum < schedules.length; schedNum++)
-							if (clients[selectedRow.rowIndex - 1][3] == schedules[schedNum][1])
-								schedules[schedNum][1] = data[fieldCtr];
-					if (fieldCtr == 4)
-						continue;
-					selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+				var repetitionExists = false;
+				for (var clientNum = 0; clientNum < clients.length; clientNum++)
+					if ((clients[clientNum][0] == document.getElementById("CLIENT_ID").value || clients[clientNum][3] == document.getElementById("CLIENT_FN").value + ' ' + document.getElementById("CLIENT_LN").value) && clientNum != selectedRow.rowIndex - 1)
+						repetitionExists = true;
+				if (!repetitionExists) {
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
+						if (fieldCtr == 3)
+							for (var schedNum = 0; schedNum < schedules.length; schedNum++)
+								if (clients[selectedRow.rowIndex - 1][3] == schedules[schedNum][1])
+									schedules[schedNum][1] = data[fieldCtr];
+						if (fieldCtr == 4)
+							continue;
+						selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+					}
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
+						if (fieldCtr == 4)
+							continue;
+						clients[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
+					}
+					sortArray(clients);
+					schedules.sort();
+					localStorage.schedules = JSON.stringify(schedules);
+					refreshTable();
 				}
 				document.getElementById("submit").innerHTML = "Append";
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
-					if (fieldCtr == 4)
-						continue;
-					clients[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
-				}
-				sortArray(clients);
-				schedules.sort();
-				localStorage.schedules = JSON.stringify(schedules);
-				refreshTable();
 			}
 			function deleteData(td) {
 				var row = td.parentElement.parentElement.rowIndex;
@@ -347,7 +359,7 @@
 				<br />
 				<div class="row">
 					<div class="col-6">
-						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center of Guidance and Counseling, 2020.</h6>
+						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center for Guidance and Counseling, 2020.</h6>
 						<h6 class="text-secondary">All rights reserved.</h6>
 					</div>
 					<div class="col float-lg-right" style="text-align: right;">

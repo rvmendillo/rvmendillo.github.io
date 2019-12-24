@@ -60,15 +60,22 @@
 				return false;
 			}
 			function submit() {
+				var repetitionExists = false;
 				if (document.getElementById("SCHED_ID").value != '' && document.getElementById("CLIENT_FULL").value != '' && document.getElementById("SCHED_DATE").value != '') {
 					var formData = getFields();
+					for (var schedNum = 0; schedNum < schedules.length; schedNum++)
+						if (schedules[schedNum][0] == document.getElementById("SCHED_ID").value)
+							repetitionExists = true;
 					if (selectedRow == null) {
-						insertData(formData);
-						saveLocalStorage(formData);
+						if (!repetitionExists) {
+							insertData(formData);
+							saveLocalStorage(formData);
+						}
 					}
 					else
 						updateData(formData);
 					resetForm();
+					document.getElementById("SCHED_DATE").value = new Date().toISOString().split('T')[0];
 				}
 			}
 			function getFields() {
@@ -130,19 +137,25 @@
 				document.getElementById("submit").innerHTML = "Update Changes";
 			}
 			function updateData(data) {
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
-					if (fieldCtr == 3)
-						continue;
-					selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+				var repetitionExists = false;
+				for (var schedNum = 0; schedNum < schedules.length; schedNum++)
+					if (schedules[schedNum][0] == document.getElementById("SCHED_ID").value && schedNum != selectedRow.rowIndex - 1)
+						repetitionExists = true;
+				if (!repetitionExists) {
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
+						if (fieldCtr == 3)
+							continue;
+						selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+					}
+					for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
+						if (fieldCtr == 3)
+							continue;
+						schedules[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
+					}
+					sortArray(schedules);
+					refreshTable();
 				}
 				document.getElementById("submit").innerHTML = "Append";
-				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++) {
-					if (fieldCtr == 3)
-						continue;
-					schedules[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
-				}
-				sortArray(schedules);
-				refreshTable();
 			}
 			function deleteData(td) {
 				var row = td.parentElement.parentElement.rowIndex;
@@ -339,7 +352,7 @@
 				<br />
 				<div class="row">
 					<div class="col-6">
-						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center of Guidance and Counseling, 2020.</h6>
+						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center for Guidance and Counseling, 2020.</h6>
 						<h6 class="text-secondary">All rights reserved.</h6>
 					</div>
 					<div class="col float-lg-right" style="text-align: right;">
