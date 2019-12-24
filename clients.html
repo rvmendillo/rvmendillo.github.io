@@ -31,7 +31,7 @@
 				localStorage.clients = JSON.stringify(array);
 			}
 			function loadLocalStorage() {
-				//if (checkAdminAccess()) {
+				if (checkAdminAccess()) {
 					clients = JSON.parse(localStorage.clients);
 					users = JSON.parse(localStorage.users);
 					schedules = JSON.parse(localStorage.schedules);
@@ -39,7 +39,7 @@
 					document.getElementsByTagName("section")[0].style.display = "block";
 					for (var clientNum = 0; clientNum < clients.length; clientNum++)
 						insertData(clients[clientNum]);
-				//}
+				}
 			}
 			function checkAdminAccess() {
 				document.getElementsByTagName("section")[0].style.display = "none";
