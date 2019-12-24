@@ -106,7 +106,9 @@
 				var table = document.getElementById("searchable").getElementsByTagName('tbody')[0];
 				table.innerHTML = '';
 				clients = [];
+				schedules = [];
 				localStorage.clients = JSON.stringify(clients);
+				localStorage.schedules = JSON.stringify(schedules);
 			}
 			function resetForm() {
 				document.getElementById("CLIENT_ID").value = '';
