@@ -31,18 +31,18 @@
 				localStorage.clients = JSON.stringify(array);
 			}
 			function loadLocalStorage() {
-				if (checkAdminAccess()) {
+				//if (checkAdminAccess()) {
+					clients = JSON.parse(localStorage.clients);
+					users = JSON.parse(localStorage.users);
+					schedules = JSON.parse(localStorage.schedules);
+					sortArray(clients);
 					document.getElementsByTagName("section")[0].style.display = "block";
 					for (var clientNum = 0; clientNum < clients.length; clientNum++)
 						insertData(clients[clientNum]);
-				}
+				//}
 			}
 			function checkAdminAccess() {
 				document.getElementsByTagName("section")[0].style.display = "none";
-				clients = JSON.parse(localStorage.clients);
-				users = JSON.parse(localStorage.users);
-				schedules = JSON.parse(localStorage.schedules);
-				sortArray(clients);
 				if (localStorage.user == "admin" && localStorage.pass == "pass")
 					return true;
 				for (var userNum = 0; userNum < users.length; userNum++)
