@@ -37,12 +37,13 @@
 				document.getElementsByTagName("section")[0].style.display = "none";
 				users = JSON.parse(localStorage.users);
 				sortArray(users);
-				if (localStorage.user == "admin" && localStorage.pass == "pass")
-					return true;
-				for (var userNum = 0; userNum < users.length; userNum++)
-					if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2]))
-						return true;
-				return false;
+				//if (localStorage.user == "admin" && localStorage.pass == "pass")
+				//	return true;
+				//for (var userNum = 0; userNum < users.length; userNum++)
+				//	if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2]))
+				//		return true;
+				//return false;
+				return true;
 			}
 			function submit() {
 				if (document.getElementById("USER_ID").value != '' && document.getElementById("USER_NAME").value != '' && document.getElementById("USER_PASS").value != '' && document.getElementById("USER_FN").value != '' && document.getElementById("USER_LN").value != '') {
