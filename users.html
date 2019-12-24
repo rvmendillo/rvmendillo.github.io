@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" sizes="500x500" href="logo.png" />
+		<link rel="stylesheet" href="bootstrap.min.css" />
+		<link rel="stylesheet" href="custom.css" />
+		<link rel="stylesheet" href="aos.css" />
+		<title>Center for Guidance and Counseling</title>
+		<script>
+			if (localStorage.users == null)
+				localStorage.users = [];
+			if (localStorage.user == null)
+				localStorage.user = "";
+			if (localStorage.pass == null)
+				localStorage.pass = "";
+			var col = 6;
+			var selectedRow = null;
+			var users = [];
+			function key(event) {
+				if (event.keyCode == 13)
+					submit();
+			}
+			function sortArray(array) {
+				array.sort();
+				localStorage.users = JSON.stringify(array);
+			}
+			function loadLocalStorage() {
+				if (checkAdminAccess()) {
+					document.getElementsByTagName("section")[0].style.display = "block";
+					for (var userNum = 0; userNum < users.length; userNum++)
+						insertData(users[userNum]);
+				}
+			}
+			function checkAdminAccess() {
+				document.getElementsByTagName("section")[0].style.display = "none";
+				users = JSON.parse(localStorage.users);
+				sortArray(users);
+				if (localStorage.user == "admin" && localStorage.pass == "pass")
+					return true;
+				for (var userNum = 0; userNum < users.length; userNum++)
+					if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2]))
+						return true;
+				return false;
+			}
+			function submit() {
+				if (document.getElementById("USER_ID").value != '' && document.getElementById("USER_NAME").value != '' && document.getElementById("USER_PASS").value != '' && document.getElementById("USER_FN").value != '' && document.getElementById("USER_LN").value != '') {
+					var formData = getFields();
+					if (selectedRow == null) {
+						insertData(formData);
+						saveLocalStorage(formData);
+					}
+					else
+						updateData(formData);
+					resetForm();
+				}
+			}
+			function getFields() {
+				var formData = [];
+				formData.push(document.getElementById("USER_ID").value);
+				formData.push(document.getElementById("USER_NAME").value);
+				formData.push(window.btoa(document.getElementById("USER_PASS").value));
+				formData.push(document.getElementById("USER_FN").value);
+				formData.push(document.getElementById("USER_LN").value);
+				formData.push(document.getElementById("USER_FN").value + ' ' + document.getElementById("USER_LN").value);
+				return formData;
+			}
+			function saveLocalStorage(data) {
+				users.push([data[0], data[1], data[2], data[3], data[4], data[5]]);
+				sortArray(users);
+				refreshTable();
+			}
+			function refreshTable() {
+				var table = document.getElementById("searchable").getElementsByTagName('tbody')[0];
+				table.innerHTML = '';
+				for (var userNum = 0; userNum < users.length; userNum++)
+					insertData(users[userNum]);
+			}
+			function insertData(data) {
+				var table = document.getElementById("searchable").getElementsByTagName('tbody')[0];
+				var tr = document.createElement("tr");
+				var trAtt = document.createAttribute("data-aos");
+				trAtt.value = "zoom-in";
+				tr.setAttributeNode(trAtt);
+				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++){
+					var td = document.createElement("td");
+					td.innerHTML = data[fieldCtr];
+					tr.appendChild(td);
+					table.appendChild(tr);
+				}
+				editCell = tr.insertCell();
+    			editCell.innerHTML = "<a onClick='editData(this)' class='btn btn-secondary' style='background: darkkhaki;'>Edit</a>";
+                delCell = tr.insertCell();
+    			delCell.innerHTML = "<a onClick='deleteData(this)' class='btn btn-secondary' style='background: rgb(212,134,35);'>Delete</a>";
+			}
+			function deleteAllData() {
+				var table = document.getElementById("searchable").getElementsByTagName('tbody')[0];
+				table.innerHTML = '';
+				users = [];
+				localStorage.users = JSON.stringify(users);
+			}
+			function resetForm() {
+				document.getElementById("USER_ID").value = '';
+				document.getElementById("USER_NAME").value = '';
+				document.getElementById("USER_PASS").value = '';
+				document.getElementById("USER_FN").value = '';
+				document.getElementById("USER_LN").value = '';
+    			selectedRow = null;
+			}
+			function editData(td) {
+				selectedRow = td.parentElement.parentElement;
+				document.getElementById("USER_ID").value = selectedRow.cells[0].innerHTML;
+				document.getElementById("USER_NAME").value = selectedRow.cells[1].innerHTML;
+				document.getElementById("USER_PASS").value = selectedRow.cells[2].innerHTML;
+				document.getElementById("USER_FN").value = selectedRow.cells[3].innerHTML;
+				document.getElementById("USER_LN").value = selectedRow.cells[4].innerHTML;
+				document.getElementById("submit").innerHTML = "Update Changes";
+			}
+			function updateData(data) {
+				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
+					selectedRow.cells[fieldCtr].innerHTML = data[fieldCtr];
+				document.getElementById("submit").innerHTML = "Append";
+				for (var fieldCtr = 0; fieldCtr < col; fieldCtr++)
+					users[selectedRow.rowIndex - 1][fieldCtr] = data[fieldCtr];
+				sortArray(users);
+				refreshTable();
+			}
+			function deleteData(td) {
+				var row = td.parentElement.parentElement.rowIndex;
+				if (confirm('Are you sure to delete this record?')) {
+					document.getElementById("searchable").deleteRow(row);
+					resetForm();
+					users.splice(row - 1, 1);
+					sortArray(users);
+					refreshTable();
+				}
+			}
+			function exportDatabase() {
+				var content = "";
+				for (var userNum = 0; userNum < users.length; userNum++) {
+					for (var fieldCtr = 0; fieldCtr < users[userNum].length; fieldCtr++) {
+						content += users[userNum][fieldCtr];
+						if (fieldCtr < users[userNum].length - 1)
+							content += "\t";
+					}
+					if (userNum < users.length - 1)
+						content += "\n";
+				}
+				uriContent = "data:application/octet-stream," + encodeURIComponent(content);
+				document.getElementById("dlink").innerHTML = "<a href=" + uriContent + " download=\"users.txt\">Here is the generated text file</a>";
+			}
+			function loadDatabase() {
+				var myFile = document.getElementById("myFile").files[0];
+				var fileReader = new FileReader();
+				fileReader.onload = function(fileLoadedEvent) {
+					var textFromFileLoaded = fileLoadedEvent.target.result;
+					var line = textFromFileLoaded.split("\n");
+					line.sort();
+					var split = [];
+					for (var userNum = 0; userNum < line.length; userNum++) {
+						prevIndex = 0;
+						char = 0;
+						for (char = 0; char < line[userNum].length; char++)
+							if (line[userNum][char] == "\t") {
+								split.push(line[userNum].slice(prevIndex, char));
+								prevIndex = char + 1;
+							}
+						split.push(line[userNum].slice(prevIndex, char));
+					}
+					users = [];
+					for (userNum = 0; userNum < line.length; userNum++) {
+						var temp = [];
+						for (fieldCtr = 0; fieldCtr < col; fieldCtr++)
+							temp.push(split[userNum * col + fieldCtr]);
+						users.push(temp);
+					}
+					sortArray(users);
+					refreshTable();
+				};
+				fileReader.readAsText(myFile, "UTF-8");
+			}
+		</script>
+	</head>
+	<body onLoad="loadLocalStorage()">
+		<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top" style="padding: 0;">
+			<div class="container">
+				<a class="navbar-brand" href="#">
+					<span>Center for Guidance and Counseling</span>
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="collapsibleNavbar">
+					<ul class="navbar-nav mx-auto text-uppercase">
+						<li class="nav-item">
+							<a class="nav-link" href="index.html">Account</a>
+						</li>
+						<li class="nav-item active">
+							<a class="nav-link" href="#">Users</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="clients.html">Clients</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="schedule.html">Schedule</a>
+						</li>
+					</ul>
+					<form action="#" class="form-inline">
+						<input class="form-control mr-sm-2" id="myInput" type="search" placeholder="SEARCH" aria-label="Search">
+					</form>
+				</div>
+			</div>
+		</nav>
+		<section style="background: url('bg.png'); background-attachment: fixed; background-position: center; background-size: cover;">
+			<div class="container" style="padding-top: 30px; padding-bottom: 30px;">
+				<div class="row">
+					<div class="col" data-aos="fade-in">
+						<h1>
+							<strong>USERS</strong>
+					  	</h1>
+						<br />
+				  	</div>
+				</div>
+				<div class="row">
+					<div class="col text-justify">
+						<form>
+							<div class="form-group" data-aos="zoom-in">
+								<div class="custom-file">
+									<input type="file" class="custom-file-input" id="myFile" name="filename" oninput="loadDatabase()" />
+									<label class="custom-file-label" for="customFile">Load database</label>
+								</div>
+							</div>
+						</form>
+						<div class="needs-validation" novalidate="novalidate">
+							<div class="form-group" data-aos="zoom-in">
+								<label for="USER_ID">USER_ID:</label>
+								<input type="number" class="form-control" id="USER_ID" name="USER_ID" value="" placeholder="Enter user's ID..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="4" onkeypress="key(event)" />
+								<div class="valid-feedback">Valid.</div>
+								<div class="invalid-feedback">Please fill out this field.</div>
+							</div>
+							<div class="form-group" data-aos="zoom-in">
+								<label for="USER_NAME">USER_NAME:</label>
+								<input type="name" class="form-control" id="USER_NAME" name="USER_NAME" value="" placeholder="Enter username..." value="E001" required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+								<div class="valid-feedback">Valid.</div>
+								<div class="invalid-feedback">Please fill out this field.</div>
+							</div>
+							<div class="form-group" data-aos="zoom-in">
+								<label for="USER_PASS">USER_PASS:</label>
+								<input type="password" class="form-control" id="USER_PASS" name="USER_PASS" value="" placeholder="Enter password..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+								<div class="valid-feedback">Valid.</div>
+								<div class="invalid-feedback">Please fill out this field.</div>
+							</div>
+							<div class="form-group" data-aos="zoom-in">
+								<label for="USER_FN">USER_FN:</label>
+								<input type="name" class="form-control" id="USER_FN" name="USER_FN" value="" placeholder="Enter first name..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+								<div class="valid-feedback">Valid.</div>
+								<div class="invalid-feedback">Please fill out this field.</div>
+							</div>
+							<div class="form-group" data-aos="zoom-in">
+								<label for="USER_LN">USER_LN:</label>
+								<input type="name" class="form-control" id="USER_LN" name="USER_LN" value="" placeholder="Enter last name..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+								<div class="valid-feedback">Valid.</div>
+								<div class="invalid-feedback">Please fill out this field.</div>
+							</div>
+							<input type="hidden" class="form-control" id="USER_FULL" name="USER_FULL" value="" placeholder="Enter full name..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="41" />
+							<br />
+							<button id="submit" class="btn btn-secondary" style="background: darkkhaki;" data-aos="zoom-in" onclick="submit()">Append</button>
+							<button onclick="resetForm()" type="reset" class="btn btn-secondary" style="background: rgb(212,134,35);" data-aos="zoom-in">Clear</button>
+						</div>
+						<br />
+						<br />
+						<div class="table-responsive">
+							<table name="table" data-aos="zoom-in" id="searchable" class="show table table-striped table-hover" style="border: 2px solid #6c757d;">
+								<thead>
+									<tr style="border: 2px solid #6c757d; top: 25px;" class="bg-secondary text-white">
+										<th>USER_ID</th>
+										<th>USER_NAME</th>
+										<th>USER_PASS</th>
+										<th>USER_FN</th>
+										<th>USER_LN</th>
+										<th>USER_FULL</th>
+										<th colspan="2">ACTION</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+						<br />
+						<button class="btn btn-secondary" style="background: darkkhaki;" data-aos="zoom-in" onclick="exportDatabase()">Export</button>
+						<button onclick="deleteAllData()" class="btn btn-secondary" style="background: rgb(212,134,35);" data-aos="zoom-in">Delete All Data</button>
+						<p id="dlink"></p>
+                    </div>
+				</div>
+			</div>
+		</section>
+		<footer class="jumbotron jumbotron-fluid text-uppercase position-sticky bg-dark">
+			<div class="container">
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<div class="row nav text-center" style="padding-top: 150px;">
+					<div class="col">
+						<ul>
+							<li><a href="index.html"><span data-aos="zoom-in">Account</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="#"><span data-aos="zoom-in">Users</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="clients.html"><span data-aos="zoom-in">Clients</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="schedule.html"><span data-aos="zoom-in">Schedule</span></a></li>
+						</ul>
+					</div>
+				</div>
+				<hr />
+				<br />
+				<div class="row">
+					<div class="col-6">
+						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center of Guidance and Counseling, 2020.</h6>
+						<h6 class="text-secondary">All rights reserved.</h6>
+					</div>
+					<div class="col float-lg-right" style="text-align: right;">
+						<h6 data-aos="zoom-in" class="text-light">Boquiren, Aaron John</h6>
+						<h6 data-aos="zoom-in" class="text-light">Gonzales, Ryan Joseph</h6>
+						<h6 data-aos="zoom-in" class="text-light">Mendillo, Rey Victor</h6>
+						<h6 class="text-secondary">CS155-1L | BM1</h6>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<a href="#" id="top" class="bg-dark text-light position-fixed">TOP</a>
+  		<script src="jquery.min.js"></script>
+  		<script src="popper.min.js"></script>
+  		<script src="bootstrap.min.js"></script>
+		<script src="aos.js"></script>
+		<script>
+  			AOS.init();
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#myInput").on("keyup", function() {
+					var value = $(this).val().toLowerCase();
+					$("#searchable tr").filter(function() {
+						$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+					});
+			  	});
+			});
+		</script>
+		<script>
+			(function() {
+  				'use strict';
+ 				window.addEventListener('load', function() {
+    				var forms = document.getElementsByClassName('needs-validation');
+    				var validation = Array.prototype.filter.call(forms, function(form) {
+      					form.addEventListener('submit', function(event) {
+        					if (form.checkValidity() === false) {
+								event.preventDefault();
+          						event.stopPropagation();
+        					}
+        					form.classList.add('was-validated');
+      					}, false);
+    				});
+  				}, false);
+			})();
+		</script>
+	</body>
+</html>	

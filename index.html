@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" sizes="500x500" href="logo.png" />
+		<link rel="stylesheet" href="bootstrap.min.css" />
+		<link rel="stylesheet" href="custom.css" />
+		<link rel="stylesheet" href="aos.css" />
+		<title>Center for Guidance and Counseling</title>
+		<script>
+			var loggedIn;
+			var users = JSON.parse(localStorage.users);
+			if (localStorage.user == null)
+				localStorage.user = "";
+			if (localStorage.pass == null)
+				localStorage.pass = "";
+			function key(event) {
+				if (event.keyCode == 13)
+					submit();
+			}
+			function onload() {
+				for (var userNum = 0; userNum < users.length; userNum++)
+					if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2])) {
+						loggedIn = true;
+						break;
+					}
+					else
+						loggedIn = false;
+				if (localStorage.user == "admin" && localStorage.pass == "pass")
+					loggedIn = true;
+				if (loggedIn) {
+					document.getElementById("USER_NAME").value = localStorage.user;
+					document.getElementById("USER_PASS").value = localStorage.pass;
+					document.getElementById("USER_NAME").disabled = true;
+					document.getElementById("USER_PASS").disabled = true;
+					document.getElementById("submit").innerHTML = "Log Out";
+					document.getElementById("submit").style.background = "rgb(212,134,35)";
+				}
+				else {
+					document.getElementById("USER_NAME").disabled = false;
+					document.getElementById("USER_PASS").disabled = false;
+					document.getElementById("submit").innerHTML = "Log In";
+					document.getElementById("submit").style.background = "darkkhaki";
+				}
+			}
+			function submit() {
+				if (loggedIn == false) {
+					localStorage.user = document.getElementById("USER_NAME").value;
+					localStorage.pass = document.getElementById("USER_PASS").value;
+					for (var userNum = 0; userNum < users.length; userNum++)
+						if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2])) {
+							document.getElementById("USER_NAME").disabled = true;
+							document.getElementById("USER_PASS").disabled = true;
+							document.getElementById("submit").innerHTML = "Log Out";
+							document.getElementById("submit").style.background = "rgb(212,134,35)";
+							loggedIn = true;
+							break;
+						}
+					if (localStorage.user == "admin" && localStorage.pass == "pass") {
+							document.getElementById("USER_NAME").disabled = true;
+							document.getElementById("USER_PASS").disabled = true;
+							document.getElementById("submit").innerHTML = "Log Out";
+							document.getElementById("submit").style.background = "rgb(212,134,35)";
+							loggedIn = true;
+						}
+				}		
+				else {
+					document.getElementById("USER_NAME").value = '';
+					document.getElementById("USER_PASS").value = '';
+					localStorage.user = '';
+					localStorage.pass = '';
+					document.getElementById("USER_NAME").disabled = false;
+					document.getElementById("USER_PASS").disabled = false;
+					document.getElementById("submit").innerHTML = "Log In";
+					document.getElementById("submit").style.background = "darkkhaki";
+					loggedIn = false;
+				}
+			}
+		</script>
+	</head>
+	<body onLoad="onload()">
+		<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top" style="padding: 0;">
+			<div class="container">
+				<a class="navbar-brand" href="#">
+					<span>Center for Guidance and Counseling</span>
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="collapsibleNavbar">
+					<ul class="navbar-nav mx-auto text-uppercase">
+						<li class="nav-item active">
+							<a class="nav-link" href="#">Account</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="users.html">Users</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="clients.html">Clients</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="schedule.html">Schedule</a>
+						</li>
+					</ul>
+					<form action="#" class="form-inline">
+						<input class="form-control mr-sm-2" id="myInput" type="search" placeholder="SEARCH" aria-label="Search">
+					</form>
+				</div>
+			</div>
+		</nav>
+		<section style="background: url('bg.png'); background-attachment: fixed; background-position: center; background-size: cover;">
+			<div class="container" style="padding-top: 30px; padding-bottom: 30px;">
+				<div class="row">
+					<div class="col" data-aos="fade-in">
+						<h1>
+							<strong>ACCOUNT</strong>
+					  	</h1>
+						<br />
+				  	</div>
+				</div>
+				<div class="row">
+					<div class="col text-justify">
+						<div class="form-group" data-aos="zoom-in">
+							<label for="USER_NAME">USER_NAME:</label>
+							<input type="name" class="form-control" id="USER_NAME" name="USER_NAME" value="" placeholder="Enter username..." value="E001" required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+							<div class="valid-feedback">Valid.</div>
+							<div class="invalid-feedback">Please fill out this field.</div>
+						</div>
+						<div class="form-group" data-aos="zoom-in">
+							<label for="USER_PASS">USER_PASS:</label>
+							<input type="password" class="form-control" id="USER_PASS" name="USER_PASS" value="" placeholder="Enter password..." required="required" style="border-radius: 30px; padding: 10px 20px; background: rgba(0,0,0,0.1);" maxlength="20" onkeypress="key(event)" />
+							<div class="valid-feedback">Valid.</div>
+							<div class="invalid-feedback">Please fill out this field.</div>
+						</div>
+						<button id="submit" class="btn btn-secondary" style="background: darkkhaki;" data-aos="zoom-in" onclick="submit()">Log In</button>
+					</div>
+					<br />
+					<br />
+				</div>
+			</div>
+		</section>
+		<footer class="jumbotron jumbotron-fluid text-uppercase position-sticky bg-dark">
+			<div class="container">
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<br />
+				<div class="row nav text-center" style="padding-top: 150px;">
+					<div class="col">
+						<ul>
+							<li><a href="#"><span data-aos="zoom-in">Account</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="users.html"><span data-aos="zoom-in">Users</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="clients.html"><span data-aos="zoom-in">Clients</span></a></li>
+						</ul>
+					</div>
+					<div class="col">
+						<ul>
+							<li><a href="schedule.html"><span data-aos="zoom-in">Schedule</span></a></li>
+						</ul>
+					</div>
+				</div>
+				<hr />
+				<br />
+				<div class="row">
+					<div class="col-6">
+						<h6 data-aos="zoom-in" class="text-light">Copyright &copy; Center of Guidance and Counseling, 2020.</h6>
+						<h6 class="text-secondary">All rights reserved.</h6>
+					</div>
+					<div class="col float-lg-right" style="text-align: right;">
+						<h6 data-aos="zoom-in" class="text-light">Boquiren, Aaron John</h6>
+						<h6 data-aos="zoom-in" class="text-light">Gonzales, Ryan Joseph</h6>
+						<h6 data-aos="zoom-in" class="text-light">Mendillo, Rey Victor</h6>
+						<h6 class="text-secondary">CS155-1L | BM1</h6>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<a href="#" id="top" class="bg-dark text-light position-fixed">TOP</a>
+  		<script src="jquery.min.js"></script>
+  		<script src="popper.min.js"></script>
+  		<script src="bootstrap.min.js"></script>
+		<script src="aos.js"></script>
+		<script>
+  			AOS.init();
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#myInput").on("keyup", function() {
+					var value = $(this).val().toLowerCase();
+					$("#searchable tr").filter(function() {
+						$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+					});
+			  	});
+			});
+		</script>
+		<script>
+			(function() {
+  				'use strict';
+ 				window.addEventListener('load', function() {
+    				var forms = document.getElementsByClassName('needs-validation');
+    				var validation = Array.prototype.filter.call(forms, function(form) {
+      					form.addEventListener('submit', function(event) {
+        					if (form.checkValidity() === false) {
+								event.preventDefault();
+          						event.stopPropagation();
+        					}
+        					form.classList.add('was-validated');
+      					}, false);
+    				});
+  				}, false);
+			})();
+		</script>
+	</body>
+</html>	
