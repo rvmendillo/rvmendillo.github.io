@@ -40,7 +40,7 @@
 				if (localStorage.user == "admin" && localStorage.pass == "pass")
 					return true;
 				for (var userNum = 0; userNum < users.length; userNum++)
-					if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2]))
+					if (localStorage.user == users[userNum][1] && localStorage.pass == CryptoJS.AES.decrypt(users[userNum][2], "Encrypted Password").toString(CryptoJS.enc.Utf8))
 						return true;
 				return false;
 			}
@@ -70,9 +70,10 @@
 			}
 			function getFields() {
 				var formData = [];
+				var encryptedPass = CryptoJS.AES.encrypt(document.getElementById("USER_PASS").value, "Encrypted Password").toString();
 				formData.push(document.getElementById("USER_ID").value);
 				formData.push(document.getElementById("USER_NAME").value);
-				formData.push(window.btoa(document.getElementById("USER_PASS").value));				
+				formData.push(encryptedPass);				
 				formData.push(capitalizeFirst(document.getElementById("USER_FN").value));
 				formData.push(capitalizeFirst(document.getElementById("USER_LN").value));
 				formData.push(capitalizeFirst(document.getElementById("USER_FN").value) + ' ' + capitalizeFirst(document.getElementById("USER_LN").value));
@@ -124,7 +125,7 @@
 				selectedRow = td.parentElement.parentElement;
 				document.getElementById("USER_ID").value = selectedRow.cells[0].innerHTML;
 				document.getElementById("USER_NAME").value = selectedRow.cells[1].innerHTML;
-				document.getElementById("USER_PASS").value = window.atob(selectedRow.cells[2].innerHTML);
+				document.getElementById("USER_PASS").value = CryptoJS.AES.decrypt(selectedRow.cells[2].innerHTML, "Encrypted Password").toString(CryptoJS.enc.Utf8);
 				document.getElementById("USER_FN").value = selectedRow.cells[3].innerHTML;
 				document.getElementById("USER_LN").value = selectedRow.cells[4].innerHTML;
 				document.getElementById("submit").innerHTML = "Update Changes";
@@ -368,6 +369,7 @@
   		<script src="popper.min.js"></script>
   		<script src="bootstrap.min.js"></script>
 		<script src="aos.js"></script>
+		<script src="crypto.js"></script>
 		<script>
   			AOS.init();
 		</script>

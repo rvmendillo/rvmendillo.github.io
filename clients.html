@@ -46,7 +46,7 @@
 				if (localStorage.user == "admin" && localStorage.pass == "pass")
 					return true;
 				for (var userNum = 0; userNum < users.length; userNum++)
-					if (localStorage.user == users[userNum][1] && localStorage.pass == window.atob(users[userNum][2]))
+					if (localStorage.user == users[userNum][1] && localStorage.pass == CryptoJS.AES.decrypt(users[userNum][2], "Encrypted Password").toString(CryptoJS.enc.Utf8))
 						return true;
 				return false;
 			}
@@ -382,6 +382,7 @@
   		<script src="popper.min.js"></script>
   		<script src="bootstrap.min.js"></script>
 		<script src="aos.js"></script>
+		<script src="crypto.js"></script>
 		<script>
   			AOS.init();
 		</script>
