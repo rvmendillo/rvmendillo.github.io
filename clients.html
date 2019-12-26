@@ -68,12 +68,18 @@
 					resetForm();
 				}
 			}
+			function capitalizeFirst(string) {
+				var stringArr = string.toLowerCase().split(' ');
+				for (wordNum = 0; wordNum < stringArr.length; wordNum++)
+					stringArr[wordNum] = stringArr[wordNum].charAt(0).toUpperCase() + stringArr[wordNum].substring(1);
+				return stringArr.join(' ');
+			}
 			function getFields() {
 				var formData = [];
 				formData.push(document.getElementById("CLIENT_ID").value);
-				formData.push(document.getElementById("CLIENT_FN").value);
-				formData.push(document.getElementById("CLIENT_LN").value);
-				formData.push(document.getElementById("CLIENT_FN").value + ' ' + document.getElementById("CLIENT_LN").value);
+				formData.push(capitalizeFirst(document.getElementById("CLIENT_FN").value));
+				formData.push(capitalizeFirst(document.getElementById("CLIENT_LN").value));
+				formData.push(capitalizeFirst(document.getElementById("CLIENT_FN").value) + ' ' + capitalizeFirst(document.getElementById("CLIENT_LN").value));
 				formData.push(localStorage.user);
 				formData.push(localStorage.user);
 				var date = new Date();
