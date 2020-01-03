@@ -34,7 +34,7 @@
 				}
 			}
 			function checkAdminAccess() {
-				document.getElementsByTagName("section")[0].style.display = "none";
+				//document.getElementsByTagName("section")[0].style.display = "none";
 				users = JSON.parse(localStorage.users);
 				sortArray(users);
 				if (localStorage.user == "admin" && localStorage.pass == "pass")
